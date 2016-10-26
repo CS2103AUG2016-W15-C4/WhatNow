@@ -28,9 +28,8 @@ public class DeleteCommandTest extends WhatNowGuiTest {
         assertDeleteSuccess(targetIndex, currentList);
 
         //invalid index
-        commandBox.runCommand("delete " + "todo " + currentList.length + 1);
+        commandBox.runCommand("delete " + "schedule " + currentList.length + 1);
         assertResultMessage("The task index provided is invalid");
-
     }
 
     /**
@@ -42,8 +41,14 @@ public class DeleteCommandTest extends WhatNowGuiTest {
         TestTask taskToDelete = currentList[targetIndexOneIndexed-1]; //-1 because array uses zero indexing
         TestTask[] expectedRemainder = TestUtil.removeTaskFromList(currentList, targetIndexOneIndexed);
         
-        commandBox.runCommand("delete " + "todo " + targetIndexOneIndexed);
-
+        for (int i = 0; i < expectedRemainder.length; i++) {
+            System.out.println("i: " + i + " " + expectedRemainder[i]);
+            System.out.println("i: " + i + " " + taskListPanel.getTask(i).toString());
+            System.out.println();
+        }
+        
+        commandBox.runCommand("delete " + "schedule " + targetIndexOneIndexed);
+        
         //confirm the list now contains all previous tasks except the deleted task
         assertTrue(taskListPanel.isListMatching(expectedRemainder));
 
