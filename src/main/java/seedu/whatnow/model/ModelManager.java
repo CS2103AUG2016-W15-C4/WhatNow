@@ -3,7 +3,6 @@ package seedu.whatnow.model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import seedu.whatnow.commons.core.ComponentManager;
 import seedu.whatnow.commons.core.Config;
 import seedu.whatnow.commons.core.LogsCenter;
@@ -59,6 +58,8 @@ public class ModelManager extends ComponentManager implements Model {
     private final Stack<String> stackOfMarkUndoneTaskTypes;
     private final Stack<String> stackOfListTypes;
     private final Stack<String> stackOfListTypesRedo;
+    private final Stack<String> stackOfChangeFileLocationOld;
+    private final Stack<String> stackOfChangeFileLocationNew;
     
     //@@author A0139128A
     /**
@@ -91,6 +92,8 @@ public class ModelManager extends ComponentManager implements Model {
         stackOfMarkUndoneTaskTypes = new Stack<>();
         stackOfListTypes = new Stack<>();
         stackOfListTypesRedo = new Stack<>();
+        stackOfChangeFileLocationOld = new Stack<>();
+        stackOfChangeFileLocationNew = new Stack<>();
     }
     //@@author A0141021H-reused
     public ModelManager() {
@@ -117,6 +120,8 @@ public class ModelManager extends ComponentManager implements Model {
         stackOfMarkUndoneTaskTypes = new Stack<>();
         stackOfListTypes = new Stack<>();
         stackOfListTypesRedo = new Stack<>();
+        stackOfChangeFileLocationOld = new Stack<>();
+        stackOfChangeFileLocationNew = new Stack<>();
     }
     //@@author A0139128A
     @Override
@@ -270,7 +275,16 @@ public class ModelManager extends ComponentManager implements Model {
     public Stack<String> getStackOfListTypesRedo() {
         return stackOfListTypesRedo;
     }
-    
+    //@@author A0141021H
+    @Override 
+    public Stack<String> getStackOfChangeFileLocationOld() {
+        return stackOfChangeFileLocationOld;
+    }
+    //@@author A0141021H
+    @Override 
+    public Stack<String> getStackOfChangeFileLocationNew() {
+        return stackOfChangeFileLocationNew;
+    }
     //=========== Filtered Task List Accessors ===============================================================
     //@@author A0139772U
     @Override

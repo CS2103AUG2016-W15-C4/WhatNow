@@ -113,6 +113,14 @@ public interface Model {
 	/**Gets a stack of String that corresponds to the list of Commands that were undone */
 	Stack<String> getStackOfListTypesRedo();
 	
+	//A0141021H
+	/**Gets a stack of String that corresponds to the list of previous file path */
+    Stack<String> getStackOfChangeFileLocationOld();
+    
+    /**Gets a stack of String that corresponds to the list of new file path */
+    Stack<String> getStackOfChangeFileLocationNew();
+    
+	
 	//@author A0139772U
 	//=========== Methods for Schedule List ===============================================================
     /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
