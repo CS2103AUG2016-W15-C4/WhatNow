@@ -98,14 +98,17 @@ public interface Model {
 	Stack<ReadOnlyTask> getDeletedStackOfTasksAddRedo();
 	
 	/** Gets Stack of Task that were marked */
-	Stack<ReadOnlyTask> getStackOfMarkDoneTask();  
-	
-	Stack<ReadOnlyTask> getStackOfMarkUndoneTask();
-	
-	Stack<String> getStackOfMarkUndoneTaskTaskType();
+	Stack<ReadOnlyTask> getStackOfMarkDoneTask();
 	
 	/** Gets stack of TaskTypes corresponding to stackOfMarkDoneTask */
-	Stack<String> getStackOfMarkDoneTaskTaskType();
+    Stack<String> getStackOfMarkDoneTaskTaskType();
+	
+	 //@@author A0141021H
+	/** Gets Stack of Task that were marked incomplete */
+	Stack<ReadOnlyTask> getStackOfMarkUndoneTask();
+	
+	/** Gets stack of TaskTypes corresponding to stackOfMarkUndoneTask */
+	Stack<String> getStackOfMarkUndoneTaskTaskType();
 	
 	/** Gets a stack of String that corresponds to the list of commands that were executed */
 	Stack<String> getStackOfListTypes();
@@ -151,6 +154,6 @@ public interface Model {
     UnmodifiableObservableList<ReadOnlyTask> getAllTaskTypeList();
 
     //@@author A0141021H
-    void changeLocation(Path destination, Config config) throws DataConversionException, IOException, TaskNotFoundException;
+    void changeLocation(Path destination) throws DataConversionException, IOException, TaskNotFoundException;
 	
 }

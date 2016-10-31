@@ -9,6 +9,8 @@ import seedu.whatnow.commons.events.model.ConfigChangedEvent;
 import seedu.whatnow.commons.events.model.WhatNowChangedEvent;
 import seedu.whatnow.commons.events.storage.DataSavingExceptionEvent;
 import seedu.whatnow.commons.exceptions.DataConversionException;
+import seedu.whatnow.commons.util.ConfigUtil;
+import seedu.whatnow.commons.util.StringUtil;
 import seedu.whatnow.model.ReadOnlyWhatNow;
 import seedu.whatnow.model.UserPrefs;
 import seedu.whatnow.model.WhatNow;
@@ -26,7 +28,9 @@ import java.util.logging.Logger;
  */
 public class StorageManager extends ComponentManager implements Storage {
 
+    public static final String DEFAULT_CONFIG_FILE = "config.json";
     private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
+    private Config config;
     private XmlWhatNowStorage xmlWhatNowStorage;
     private UserPrefsStorage userPrefsStorage;
 
@@ -39,6 +43,11 @@ public class StorageManager extends ComponentManager implements Storage {
 
     public StorageManager(String xmlWhatNowFilePath, String userPrefsFilePath) {
         this(new XmlWhatNowStorage(xmlWhatNowFilePath), new JsonUserPrefsStorage(userPrefsFilePath));
+    }
+    
+    public StorageManager(Config config) {
+        this(new XmlWhatNowStorage(config.getWhatNowFilePath()), new JsonUserPrefsStorage(config.getUserPrefsFilePath()));
+        this.config = config;
     }
 
     // ================ UserPrefs methods ==============================
@@ -117,13 +126,21 @@ public class StorageManager extends ComponentManager implements Storage {
             Path source = FileSystems.getDefault().getPath(xmlWhatNowStorage.getWhatNowFilePath());
             xmlWhatNowStorage.setWhatNowFilePath(event.destination.toString());
             Files.move(source, event.destination, StandardCopyOption.REPLACE_EXISTING);
-            saveConfig(event.config);
+            config.setOldWhatNowFilePath(source.toString());
+            config.setWhatNowFilePath(event.destination.toString());
+            saveConfig(config);
         } catch (IOException e) {
             raise(new DataSavingExceptionEvent(e));
         }
-    }
-    
-    
-    // ================ CompletedTask Storage methods ==============================
+        
+        String configFilePathUsed = DEFAULT_CONFIG_FILE;
+        
+        try {
+            ConfigUtil.saveConfig(config, configFilePathUsed);
+        } catch (IOException e) {
+            logger.warning("Failed to save config file : " + StringUtil.getDetails(e));
+        } 
 
+    }
+    // ================ CompletedTask Storage methods ==============================
 }

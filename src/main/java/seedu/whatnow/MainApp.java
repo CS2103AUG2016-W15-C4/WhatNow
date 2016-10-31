@@ -49,7 +49,7 @@ public class MainApp extends Application {
         super.init();
 
         config = initConfig(getApplicationParameter("config"));
-        storage = new StorageManager(config.getWhatNowFilePath(), config.getUserPrefsFilePath());
+        storage = new StorageManager(config);
         userPrefs = initPrefs(config);
 
         initLogging(config);

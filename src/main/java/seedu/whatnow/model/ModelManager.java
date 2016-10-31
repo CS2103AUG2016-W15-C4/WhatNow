@@ -148,8 +148,8 @@ public class ModelManager extends ComponentManager implements Model {
     }
     //@@author A0141021H
     /** Raises an event to indicate the config has changed */
-    private void indicateConfigChanged(Path destination, Config config) {
-        raise(new ConfigChangedEvent(destination, config));
+    private void indicateConfigChanged(Path destination) {
+        raise(new ConfigChangedEvent(destination));
     }
     //@@author A0141021H-reused
     /** Raises an event to indicate that a task was added */
@@ -163,8 +163,9 @@ public class ModelManager extends ComponentManager implements Model {
     }
     //@@author A0141021H
     @Override
-    public synchronized void changeLocation(Path destination, Config config) throws DataConversionException, IOException, TaskNotFoundException {
-        indicateConfigChanged(destination, config);
+    public synchronized void changeLocation(Path destination) throws DataConversionException, IOException, TaskNotFoundException {
+        indicateWhatNowChanged();
+        indicateConfigChanged(destination);
         indicateWhatNowChanged();
     }
     //@@author A0139128A-reused

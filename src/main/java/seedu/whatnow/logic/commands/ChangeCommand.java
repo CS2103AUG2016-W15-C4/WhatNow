@@ -7,9 +7,6 @@ import java.util.logging.Logger;
 import seedu.whatnow.commons.core.Config;
 import seedu.whatnow.commons.core.LogsCenter;
 import seedu.whatnow.commons.exceptions.DataConversionException;
-import seedu.whatnow.commons.util.ConfigUtil;
-import seedu.whatnow.commons.util.StringUtil;
-import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
 import seedu.whatnow.model.task.UniqueTaskList.TaskNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -19,7 +16,7 @@ import static seedu.whatnow.commons.core.Messages.*;
 /**
  * Changes the data file location of WhatNow.
  */
-public class ChangeCommand extends UndoAndRedo {
+public class ChangeCommand extends UndoAndRedo{
 
     public static final String COMMAND_WORD = "change";
 
@@ -44,9 +41,7 @@ public class ChangeCommand extends UndoAndRedo {
 
     public Path source; 
 
-    public Path destination; 
-
-    public Config config = new Config();
+    public Path destination;
 
     private static final Logger logger = LogsCenter.getLogger(ChangeCommand.class);
 
@@ -58,8 +53,6 @@ public class ChangeCommand extends UndoAndRedo {
 
     @Override
     public CommandResult execute() {
-        String oldPath = config.getWhatNowFilePath();
-        
         //new path convert from String to Path
         Path path = FileSystems.getDefault().getPath(newPath);
 
@@ -75,13 +68,10 @@ public class ChangeCommand extends UndoAndRedo {
             //update the new Path to add "whatNow.xml" behind
             path = FileSystems.getDefault().getPath(newPath);
 
-            config.setWhatNowFilePath(newPath);
-
             String configFilePathUsed = Config.DEFAULT_CONFIG_FILE;
 
             try {
-                model.changeLocation(path, config);
-                model.getStackOfChangeFileLocationOld().push(oldPath);
+                model.changeLocation(path);
                 model.getUndoStack().push(this);
             } catch (DataConversionException e1) {
                 e1.printStackTrace();
@@ -91,12 +81,6 @@ public class ChangeCommand extends UndoAndRedo {
                 e1.printStackTrace();
             }
 
-            try {
-                ConfigUtil.saveConfig(config, configFilePathUsed);
-            } catch (IOException e) {
-                logger.warning("Failed to save config file : " + StringUtil.getDetails(e));
-            } 
-
             return new CommandResult(String.format(MESSAGE_SUCCESS, newPath));
         } else { 
             return new CommandResult(String.format(MESSAGE_INVALID_PATH, newPath));
@@ -104,74 +88,12 @@ public class ChangeCommand extends UndoAndRedo {
     }
 
     @Override
-    public CommandResult undo() throws DuplicateTaskException, TaskNotFoundException {
-        if(model.getStackOfChangeFileLocationOld().isEmpty() && model.getStackOfChangeFileLocationNew().isEmpty()) {
-            return new CommandResult(String.format(ChangeCommand.MESSAGE_UNDOFAIL));
-        } else {
-        String curr = config.getWhatNowFilePath();
-        
-        String next = model.getStackOfChangeFileLocationOld().pop();
-        
-        model.getStackOfChangeFileLocationNew().push(curr);
-        
-        Path prevPath = FileSystems.getDefault().getPath(next);
-        System.out.println("change location to "+prevPath);
-        config.setWhatNowFilePath(next);
-        
-        try {
-            model.changeLocation(prevPath, config);
-        } catch (DataConversionException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        String configFilePathUsed = Config.DEFAULT_CONFIG_FILE;
-        
-        try {
-            ConfigUtil.saveConfig(config, configFilePathUsed);
-        } catch (IOException e) {
-            logger.warning("Failed to save config file : " + StringUtil.getDetails(e));
-        } 
-
-        return new CommandResult(String.format(MESSAGE_SUCCESS, newPath));
-        }
+    public CommandResult undo() {  
+        return null;
     }
 
     @Override
-    public CommandResult redo() throws TaskNotFoundException {
-        
-        if(model.getStackOfChangeFileLocationOld().isEmpty() && model.getStackOfChangeFileLocationNew().isEmpty() && model.getRedoStack().isEmpty()) {
-            return new CommandResult(String.format(ChangeCommand.MESSAGE_REDOFAIL));
-        } else { 
-            
-            String curr = config.getWhatNowFilePath();//data
-            
-            String next = model.getStackOfChangeFileLocationNew().pop();//desktop
-            
-            model.getStackOfChangeFileLocationOld().push(curr);
-            
-            Path prevPath = FileSystems.getDefault().getPath(next);
-            System.out.println("changing path to: "+prevPath);
-            config.setWhatNowFilePath(next);
-            
-            try {
-                model.changeLocation(prevPath, config);
-            } catch (DataConversionException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-            String configFilePathUsed = Config.DEFAULT_CONFIG_FILE;
-            
-            try {
-                ConfigUtil.saveConfig(config, configFilePathUsed);
-            } catch (IOException e) {
-                logger.warning("Failed to save config file : " + StringUtil.getDetails(e));
-            } 
-
-            return new CommandResult(String.format(MESSAGE_SUCCESS, newPath));
-        }
+    public CommandResult redo() {
+        return null;      
     }
 }
