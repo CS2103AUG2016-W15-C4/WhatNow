@@ -1,11 +1,20 @@
 //@@author A0139128A
 package seedu.whatnow.logic.commands;
 
+import java.nio.file.FileSystems;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+import seedu.whatnow.commons.core.Config;
+import seedu.whatnow.commons.core.LogsCenter;
+import seedu.whatnow.commons.exceptions.DataConversionException;
+import seedu.whatnow.commons.util.ConfigUtil;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
 import seedu.whatnow.model.task.UniqueTaskList;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
 import seedu.whatnow.model.task.UniqueTaskList.TaskNotFoundException;
+import seedu.whatnow.storage.StorageManager;
 
 public class UndoCommand extends Command{
 
@@ -21,6 +30,8 @@ public class UndoCommand extends Command{
 	public static final String UNKNOWN_COMMAND_FOUND = "Unknown Command Found in Undo";
 
 	public static final String MESSAGE_LIST_NOT_ENTERED = " No previous list command was entered";
+	
+	private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
 
 	public final String ADD_COMMAND = "add";
 	public final String DELETE_COMMAND = "delete";
@@ -29,6 +40,9 @@ public class UndoCommand extends Command{
 	public final String MARKUNDONE_COMMAND = "undone";
 	public final String UPDATE_COMMAND = "update";
 	public final String CLEAR_COMMAND = "clear";
+	public final String CHANGE_COMMAND = "change";
+	
+	public static final String DEFAULT_CONFIG_FILE = "config.json";
 
 	@Override
 	public CommandResult execute() throws DuplicateTaskException, TaskNotFoundException {
@@ -56,11 +70,38 @@ public class UndoCommand extends Command{
 			return performUndoUpdate();
 		}else if(reqCommand.equals(CLEAR_COMMAND)) {
 			return performUndoClear();
+		}else if(reqCommand.equals(CHANGE_COMMAND)) {
+            return performUndoChange();
 		}else
 			return new CommandResult(UNKNOWN_COMMAND_FOUND);
 	}
-
-	private CommandResult performUndoAdd() {
+	//@@author A0141021H
+	private CommandResult performUndoChange() {
+	    if(model.getStackOfChangeFileLocationOld().isEmpty()) {
+            return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
+        }
+	    Config config;
+	    String configFilePathUsed = Config.DEFAULT_CONFIG_FILE;
+	    String curr="";
+	    String old="";
+	    try {
+	        Optional<Config> configOptional = ConfigUtil.readConfig(configFilePathUsed);
+            config = configOptional.orElse(new Config());
+            curr = config.getWhatNowFilePath();
+            old = model.getStackOfChangeFileLocationOld().pop();
+            model.getStackOfChangeFileLocationNew().push(curr);
+            model.changeLocation(FileSystems.getDefault().getPath(old));
+            
+        } catch (DataConversionException e) {
+            logger.warning("Config file at " + configFilePathUsed + " is not in the correct format. " +
+                    "Using default config properties");
+            config = new Config();
+        } 
+	    return new CommandResult(String.format(ChangeCommand.MESSAGE_UNDOSUCCESS, old));
+    }
+	
+	//@@author A0139128A
+    private CommandResult performUndoAdd() {
 		assert model != null;
 		if(model.getDeletedStackOfTasksAdd().isEmpty()) {
 			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
@@ -76,6 +117,7 @@ public class UndoCommand extends Command{
 		}
 	}
 
+    //@@author A0139128A
 	private CommandResult performUndoDelete() {
 		if(model.getDeletedStackOfTasks().isEmpty() || model.getDeletedStackOfTasksIndex().isEmpty()) {
 			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
@@ -91,7 +133,8 @@ public class UndoCommand extends Command{
 		}
 		return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
 	}
-
+	
+	//@@author A0139128A
 	private CommandResult performUndoList() {
 		if(model.getStackOfListTypes().isEmpty()) {
 			return new CommandResult(MESSAGE_LIST_NOT_ENTERED); 
@@ -139,7 +182,8 @@ public class UndoCommand extends Command{
 			return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
 		}
 	}
-
+	
+	//@@author A0139128A
 	private CommandResult performUndoMarkUnDone() {
 		if(model.getStackOfMarkUndoneTask().isEmpty()) {
 			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
@@ -155,7 +199,8 @@ public class UndoCommand extends Command{
 			return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
 		}
 	}
-
+	
+	//@@author A0139128A
 	private CommandResult performUndoUpdate() throws TaskNotFoundException {
 		assert model != null;
 		if(model.getOldTask().isEmpty() && model.getNewTask().isEmpty()) {
@@ -175,7 +220,8 @@ public class UndoCommand extends Command{
 			return new CommandResult(UndoCommand.MESSAGE_SUCCESS); 
 		}
 	}
-
+	
+	//@@author A0139128A
 	private CommandResult performUndoClear() {
 		assert model != null;
 		model.revertData();

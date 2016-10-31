@@ -1,15 +1,11 @@
 //@@author A0139772U
 package seedu.whatnow.model;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.Stack;
 
-import seedu.whatnow.commons.core.Config;
 import seedu.whatnow.commons.core.UnmodifiableObservableList;
-import seedu.whatnow.commons.exceptions.DataConversionException;
-import seedu.whatnow.logic.commands.Command;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
@@ -107,7 +103,7 @@ public interface Model {
 	Stack<ReadOnlyTask> getDeletedStackOfTasksAddRedo();
 	
 	/** Gets Stack of Task that were marked */
-	Stack<ReadOnlyTask> getStackOfMarkDoneTask();  
+	Stack<ReadOnlyTask> getStackOfMarkDoneTask();
 	
 	/** Gets stack of Task that were marked and corresponds to RedoCommand */
 	Stack<ReadOnlyTask> getStackOfMarkDoneTaskRedo();
@@ -124,8 +120,15 @@ public interface Model {
 	/**Gets a stack of String that corresponds to the list of Commands that were undone */
 	Stack<String> getStackOfListTypesRedo();
 	
-	//=========== Methods for Schedule List ===============================================================
+	//@@author A0141021H
+	/**Gets a stack of String that corresponds to the list of previous file path */
+    Stack<String> getStackOfChangeFileLocationOld();
+    
+    /**Gets a stack of String that corresponds to the list of new file path */
+    Stack<String> getStackOfChangeFileLocationNew();
+	
 	//@@author A0139772U
+	//=========== Methods for Schedule List ===============================================================
 	/** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
     UnmodifiableObservableList<ReadOnlyTask> getCurrentFilteredScheduleList();
     
@@ -154,5 +157,5 @@ public interface Model {
     UnmodifiableObservableList<ReadOnlyTask> getAllTaskTypeList();
 
     //@@author A0141021H
-    void changeLocation(Path destination, Config config) throws DataConversionException, IOException, TaskNotFoundException;
+    void changeLocation(Path destination);
 }

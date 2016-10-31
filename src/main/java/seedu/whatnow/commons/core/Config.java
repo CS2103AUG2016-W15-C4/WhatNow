@@ -1,4 +1,4 @@
-//@@author A0141021H-reused
+//@@author A0141021H
 package seedu.whatnow.commons.core;
 
 import java.util.Objects;
@@ -11,11 +11,11 @@ public class Config {
 
     public static final String DEFAULT_CONFIG_FILE = "config.json";
 
-    // Config values customizable through config file
     private String appTitle = "WhatNow App";
     private Level logLevel = Level.INFO;
     private String userPrefsFilePath = "preferences.json";
     private String whatNowFilePath = "data/whatnow.xml";
+    private String oldWhatNowFilePath = "";
     private String whatNowName = "MyWhatNow";
 
 
@@ -49,9 +49,17 @@ public class Config {
     public String getWhatNowFilePath() {
         return whatNowFilePath;
     }
+    
+    public String getOldWhatNowFilePath() {
+        return oldWhatNowFilePath;
+    }
 
     public void setWhatNowFilePath(String whatNowFilePath) {
         this.whatNowFilePath = whatNowFilePath;
+    }
+    
+    public void setOldWhatNowFilePath(String oldWhatNowFilePath) {
+        this.oldWhatNowFilePath = oldWhatNowFilePath;
     }
 
     public String getWhatNowName() {
@@ -83,7 +91,7 @@ public class Config {
 
     @Override
     public int hashCode() {
-        return Objects.hash(appTitle, logLevel, userPrefsFilePath, whatNowFilePath, whatNowName);
+        return Objects.hash(appTitle, logLevel, userPrefsFilePath, whatNowFilePath, oldWhatNowFilePath, whatNowName);
     }
 
     @Override
@@ -93,6 +101,7 @@ public class Config {
         sb.append("\nCurrent log level : " + logLevel);
         sb.append("\nPreference file Location : " + userPrefsFilePath);
         sb.append("\nLocal data file location : " + whatNowFilePath);
+        sb.append("\nOld data file location : " + oldWhatNowFilePath);
         sb.append("\nWhatNow name : " + whatNowName);
         return sb.toString();
     }
