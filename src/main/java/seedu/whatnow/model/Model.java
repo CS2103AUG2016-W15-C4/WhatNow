@@ -1,13 +1,11 @@
 //@@author A0139772U
 package seedu.whatnow.model;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.Stack;
 
 import seedu.whatnow.commons.core.UnmodifiableObservableList;
-import seedu.whatnow.commons.exceptions.DataConversionException;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
@@ -160,5 +158,5 @@ public interface Model {
     UnmodifiableObservableList<ReadOnlyTask> getAllTaskTypeList();
 
     //@@author A0141021H
-    void changeLocation(Path destination) throws DataConversionException, IOException, TaskNotFoundException;
+    void changeLocation(Path destination);
 }

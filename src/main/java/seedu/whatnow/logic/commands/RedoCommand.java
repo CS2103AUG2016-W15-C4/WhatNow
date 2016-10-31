@@ -1,11 +1,20 @@
 package seedu.whatnow.logic.commands;
 
+import java.nio.file.FileSystems;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+import seedu.whatnow.commons.core.Config;
+import seedu.whatnow.commons.core.LogsCenter;
+import seedu.whatnow.commons.exceptions.DataConversionException;
+import seedu.whatnow.commons.util.ConfigUtil;
 import seedu.whatnow.model.WhatNow;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
 import seedu.whatnow.model.task.UniqueTaskList;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
 import seedu.whatnow.model.task.UniqueTaskList.TaskNotFoundException;
+import seedu.whatnow.storage.StorageManager;
 
 public class RedoCommand extends Command{
 	//@@author A0139128A
@@ -21,6 +30,8 @@ public class RedoCommand extends Command{
 	public static final String UNKNOWN_COMMAND_FOUND = "Unknown Command found";
 
 	public static final String MESSAGE_LIST_NO_REDO_LIST = " No list command to redo";
+	
+	private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
 
 	//@@author A0139128A-reused
 	public final String ADD_COMMAND = "add";
@@ -30,6 +41,9 @@ public class RedoCommand extends Command{
 	public final String MARKUNDONE_COMMAND = "undone";
 	public final String UPDATE_COMMAND = "update";
 	public final String CLEAR_COMMAND = "clear";
+	public final String CHANGE_COMMAND = "change";
+	
+	public static final String DEFAULT_CONFIG_FILE = "config.json";
 	
 	//@@author A0139128A
 	@Override
@@ -60,10 +74,37 @@ public class RedoCommand extends Command{
 			return performRedoUpdate();
 		} else if(reqCommand.equals(CLEAR_COMMAND)) {
 			return performRedoClear();
+		}else if(reqCommand.equals(CHANGE_COMMAND)) {
+            return performRedoChange();
 		} else
 			return new CommandResult(UNKNOWN_COMMAND_FOUND);
 	}
-	//@@author A0139128A
+	
+	//@@author A0141021H
+	private CommandResult performRedoChange() {
+	    if(model.getStackOfChangeFileLocationNew().isEmpty()) {
+            return new CommandResult(String.format(RedoCommand.MESSAGE_FAIL));
+        }
+        Config config;
+        String configFilePathUsed = Config.DEFAULT_CONFIG_FILE;
+        String curr="";
+        String old="";
+        try {
+            Optional<Config> configOptional = ConfigUtil.readConfig(configFilePathUsed);
+            config = configOptional.orElse(new Config());
+            curr = config.getWhatNowFilePath();
+            old = model.getStackOfChangeFileLocationNew().pop();
+            model.getStackOfChangeFileLocationOld().push(curr);
+            model.changeLocation(FileSystems.getDefault().getPath(old));
+        } catch (DataConversionException e) {
+            logger.warning("Config file at " + configFilePathUsed + " is not in the correct format. " +
+                    "Using default config properties");
+            config = new Config();
+        } 
+        return new CommandResult(String.format(ChangeCommand.MESSAGE_REDOSUCCESS, old));
+    }
+	
+    //@@author A0139128A
 	private CommandResult performRedoAdd() {
 		assert model != null;
 		if(model.getDeletedStackOfTasksAddRedo().isEmpty()) {

@@ -169,7 +169,7 @@ public class ModelManager extends ComponentManager implements Model {
     }
     //@@author A0141021H
     @Override
-    public synchronized void changeLocation(Path destination) throws DataConversionException, IOException, TaskNotFoundException {
+    public synchronized void changeLocation(Path destination){
         indicateWhatNowChanged();
         indicateConfigChanged(destination);
         indicateWhatNowChanged();

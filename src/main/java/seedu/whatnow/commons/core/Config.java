@@ -1,4 +1,4 @@
-//@@author A0141021H-reused
+//@@author A0141021H
 package seedu.whatnow.commons.core;
 
 import java.util.Objects;
@@ -11,7 +11,6 @@ public class Config {
 
     public static final String DEFAULT_CONFIG_FILE = "config.json";
 
-    // Config values customizable through config file
     private String appTitle = "WhatNow App";
     private Level logLevel = Level.INFO;
     private String userPrefsFilePath = "preferences.json";
