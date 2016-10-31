@@ -147,33 +147,36 @@ public class UndoCommand extends Command{
 				return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
 			}else {
 				String reqCommandListType = model.getStackOfListTypes().peek();
-				if(reqCommandListType.equals(ListCommand.TASK_STATUS_ALL)) {
-					model.updateFilteredListToShowAll();
-					model.updateFilteredScheduleListToShowAll();
-					return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
-				}else if(reqCommandListType.equals(ListCommand.TASK_STATUS_INCOMPLETE)) {
-					model.updateFilteredListToShowAllIncomplete();
-					model.updateFilteredScheduleListToShowAllIncomplete();
-					return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
-				}else {
-					model.updateFilteredListToShowAllCompleted();
-					model.updateFilteredScheduleListToShowAllCompleted();
-					return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
-				}
+				return performRequiredUndoUpdateList(reqCommandListType);
 			}
 		}
 	}
-	
-	//@@author A0139128A
-	private CommandResult performUndoMarkDone() {
+
+	private CommandResult performRequiredUndoUpdateList(String reqCommandListType) {
+	    if(reqCommandListType.equals(ListCommand.TASK_STATUS_ALL)) {
+            model.updateFilteredListToShowAll();
+            model.updateFilteredScheduleListToShowAll();
+            return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
+        }else if(reqCommandListType.equals(ListCommand.TASK_STATUS_INCOMPLETE)) {
+            model.updateFilteredListToShowAllIncomplete();
+            model.updateFilteredScheduleListToShowAllIncomplete();
+            return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
+        }else {
+            model.updateFilteredListToShowAllCompleted();
+            model.updateFilteredScheduleListToShowAllCompleted();
+            return new CommandResult(UndoCommand.MESSAGE_SUCCESS);
+        }
+    }
+    private CommandResult performUndoMarkDone() {
 		if(model.getStackOfMarkDoneTask().isEmpty()) {
 			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
 		}else {
 			ReadOnlyTask taskToReAdd = model.getStackOfMarkDoneTask().pop();
 			try {
+			    model.getStackOfMarkDoneTaskRedo().push(taskToReAdd);
 				model.unMarkTask(taskToReAdd);
-				model.getStackOfMarkDoneTaskRedo().push(taskToReAdd);
 			} catch(TaskNotFoundException tnfe) {
+			    model.getStackOfMarkDoneTaskRedo().pop();
 				return new CommandResult(UndoCommand.MESSAGE_FAIL);
 			}
 			return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
@@ -190,6 +193,7 @@ public class UndoCommand extends Command{
 				model.markTask(taskToReAdd);
 				model.getStackOfMarkUndoneTaskRedo().pop();
 			} catch(TaskNotFoundException tnfe) {
+			    model.getStackOfMarkUndoneTaskRedo().push(taskToReAdd);
 				return new CommandResult(UndoCommand.MESSAGE_FAIL);
 			}
 			return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
@@ -204,11 +208,13 @@ public class UndoCommand extends Command{
 		}else {
 			ReadOnlyTask originalTask = model.getOldTask().pop();
 			ReadOnlyTask unwantedTask = model.getNewTask().pop();
-			model.getOldTask().push(unwantedTask);
-			model.getNewTask().push(originalTask);
 			try {
+			    model.getOldTask().push(unwantedTask);
+	            model.getNewTask().push(originalTask);
 				model.updateTask(unwantedTask, (Task) originalTask);
 			} catch(UniqueTaskList.DuplicateTaskException utle) {
+			    model.getOldTask().pop();
+			    model.getNewTask().pop();
 				return new CommandResult(UndoCommand.MESSAGE_FAIL);
 			}
 			return new CommandResult(UndoCommand.MESSAGE_SUCCESS); 

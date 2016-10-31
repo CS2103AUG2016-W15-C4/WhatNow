@@ -126,11 +126,10 @@ public interface Model {
     
     /**Gets a stack of String that corresponds to the list of new file path */
     Stack<String> getStackOfChangeFileLocationNew();
-    
 	
 	//@@author A0139772U
 	//=========== Methods for Schedule List ===============================================================
-    /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
+	/** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
     UnmodifiableObservableList<ReadOnlyTask> getCurrentFilteredScheduleList();
     
     /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
