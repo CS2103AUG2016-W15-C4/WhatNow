@@ -1,17 +1,19 @@
 //@@author A0139772U
 package seedu.whatnow.logic.commands;
 
+import javafx.collections.ObservableList;
 import seedu.whatnow.commons.core.Messages;
 import seedu.whatnow.commons.core.UnmodifiableObservableList;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
+import seedu.whatnow.model.task.UniqueTaskList;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
 import seedu.whatnow.model.task.UniqueTaskList.TaskNotFoundException;
 
 /**
  * Deletes a task identified using it's last displayed index from WhatNow.
  */
-public class DeleteCommand extends UndoAndRedo {
+public class DeleteCommand extends Command {
 
 	public static final String COMMAND_WORD = "delete";
 
@@ -51,43 +53,13 @@ public class DeleteCommand extends UndoAndRedo {
 
 		assert model != null;	 
 		try {
-			model.deleteTask(taskToDelete);
-			model.getUndoStack().push(this);
+			int indexRemoved = model.deleteTask(taskToDelete);
+			model.getUndoStack().push(COMMAND_WORD);
 			model.getDeletedStackOfTasks().push(taskToDelete);
+			model.getDeletedStackOfTasksIndex().push(indexRemoved);
 		} catch (TaskNotFoundException pnfe) {
 			assert false : "The target task cannot be missing";
 		}
 		return new CommandResult(String.format(MESSAGE_DELETE_TASK_SUCCESS, taskToDelete));
-	}
-
-	//@@author A0139128A
-	@Override
-	public CommandResult undo() {
-		if(model.getDeletedStackOfTasks().isEmpty()) {
-			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
-		}
-		ReadOnlyTask taskToReAdd = model.getDeletedStackOfTasks().pop();
-		model.getDeletedStackOfTasksRedo().push(taskToReAdd);
-		try {
-			model.addTask((Task)taskToReAdd);
-		} catch(DuplicateTaskException e) {
-			return new CommandResult(String.format(UndoCommand.MESSAGE_FAIL));
-		}
-		return new CommandResult(String.format(UndoCommand.MESSAGE_SUCCESS));
-	}
-	
-	@Override
-	public CommandResult redo() {
-		if(model.getDeletedStackOfTasksRedo().isEmpty()) {
-			return new CommandResult(String.format(RedoCommand.MESSAGE_FAIL));
-		}
-		ReadOnlyTask taskToDelete = model.getDeletedStackOfTasksRedo().pop();
-		model.getDeletedStackOfTasks().push(taskToDelete);
-		try {
-			model.deleteTask((Task) taskToDelete);
-		} catch(TaskNotFoundException e) {
-			return new CommandResult(String.format(RedoCommand.MESSAGE_FAIL));
-		}
-		return new CommandResult(String.format(RedoCommand.MESSAGE_SUCCESS));
 	}
 }

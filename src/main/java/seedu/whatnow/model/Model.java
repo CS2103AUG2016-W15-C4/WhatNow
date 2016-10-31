@@ -6,10 +6,8 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.Stack;
 
-import seedu.whatnow.commons.core.Config;
 import seedu.whatnow.commons.core.UnmodifiableObservableList;
 import seedu.whatnow.commons.exceptions.DataConversionException;
-import seedu.whatnow.logic.commands.Command;
 import seedu.whatnow.model.task.ReadOnlyTask;
 import seedu.whatnow.model.task.Task;
 import seedu.whatnow.model.task.UniqueTaskList.DuplicateTaskException;
@@ -33,11 +31,14 @@ public interface Model {
     //=========== Methods for Task List ===============================================================
 
     /** Deletes the given task. */
-    void deleteTask(ReadOnlyTask target) throws TaskNotFoundException;
+    int deleteTask(ReadOnlyTask target) throws TaskNotFoundException;
 
     /** Adds the given task */
     void addTask(Task task) throws DuplicateTaskException;
-
+    
+    /** Adds the given task at specific index */
+    void addTaskSpecific(Task task, int idx) throws DuplicateTaskException;
+    
     //@@author A0139772U
     /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
     UnmodifiableObservableList<ReadOnlyTask> getCurrentFilteredTaskList();
@@ -74,10 +75,10 @@ public interface Model {
 	
 	//@@author A0139128A
     /**Gets the UndoStack if possible */
-    Stack<Command> getUndoStack();
+    Stack<String> getUndoStack();
     
     /**Gets the redoStack if possible*/
-    Stack<Command> getRedoStack();
+    Stack<String> getRedoStack();
     
     /**Gets the oldTask if possible */
 	Stack<ReadOnlyTask> getOldTask();
@@ -88,9 +89,15 @@ public interface Model {
 	/** Gets the deletedStackOfTask that corresponds to deleteCommand*/
 	Stack<ReadOnlyTask> getDeletedStackOfTasks();
 
+	/** Gets the deletedStackOfTsksIndex that corresponds to deleteCommand */
+	Stack<Integer> getDeletedStackOfTasksIndex();
+	
 	/** Gets the deletedStackOfTaskRedo that corresponds to deleteCommand*/
 	Stack<ReadOnlyTask> getDeletedStackOfTasksRedo();
 	
+	/** Gets the deletedStackOfTasksIndexRedo that corresponds to deleteCommand */
+	Stack<Integer> getDeletedStackOfTasksIndexRedo();
+	 
 	/** Gets the deleted StackOfTasks that corresponds to AddCommand */
 	Stack<ReadOnlyTask> getDeletedStackOfTasksAdd();
 
@@ -100,15 +107,14 @@ public interface Model {
 	/** Gets Stack of Task that were marked */
 	Stack<ReadOnlyTask> getStackOfMarkDoneTask();
 	
-	/** Gets stack of TaskTypes corresponding to stackOfMarkDoneTask */
-    Stack<String> getStackOfMarkDoneTaskTaskType();
+	/** Gets stack of Task that were marked and corresponds to RedoCommand */
+	Stack<ReadOnlyTask> getStackOfMarkDoneTaskRedo();
 	
-	 //@@author A0141021H
-	/** Gets Stack of Task that were marked incomplete */
+	/** Gets stack of Task that were marked and corresponds to UndoneCommand */
 	Stack<ReadOnlyTask> getStackOfMarkUndoneTask();
 	
-	/** Gets stack of TaskTypes corresponding to stackOfMarkUndoneTask */
-	Stack<String> getStackOfMarkUndoneTaskTaskType();
+	/** Gets stack of Task that were marked and corresponds to RedoCommand */
+	Stack<ReadOnlyTask> getStackOfMarkUndoneTaskRedo();
 	
 	/** Gets a stack of String that corresponds to the list of commands that were executed */
 	Stack<String> getStackOfListTypes();
@@ -116,7 +122,7 @@ public interface Model {
 	/**Gets a stack of String that corresponds to the list of Commands that were undone */
 	Stack<String> getStackOfListTypesRedo();
 	
-	//A0141021H
+	//@@author A0141021H
 	/**Gets a stack of String that corresponds to the list of previous file path */
     Stack<String> getStackOfChangeFileLocationOld();
     
@@ -124,13 +130,13 @@ public interface Model {
     Stack<String> getStackOfChangeFileLocationNew();
     
 	
-	//@author A0139772U
+	//@@author A0139772U
 	//=========== Methods for Schedule List ===============================================================
     /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
     UnmodifiableObservableList<ReadOnlyTask> getCurrentFilteredScheduleList();
     
     /** Returns the filtered task list as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
-    UnmodifiableObservableList<ReadOnlyTask> getFilteredScheduleList();
+    UnmodifiableObservableList<ReadOnlyTask> getFilteredScheduleList(boolean isUndo);
     
     /** Returns the filtered task list with filter keyword as an {@code UnmodifiableObservableList<ReadOnlyTask>} */
     UnmodifiableObservableList<ReadOnlyTask> getFilteredScheduleList(Set<String> key);
@@ -155,5 +161,4 @@ public interface Model {
 
     //@@author A0141021H
     void changeLocation(Path destination) throws DataConversionException, IOException, TaskNotFoundException;
-	
 }
